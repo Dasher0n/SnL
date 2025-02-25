@@ -1,5 +1,4 @@
 import numpy as np
-import sphinx
 
 class Dado:
     """
@@ -34,6 +33,3 @@ class Dado:
         """
         return np.random.randint(1, self.lados + 1)
 
-d6=Dado()
-
-print("Tiro de Dado:", d6.lanzar())
