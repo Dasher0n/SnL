@@ -1,60 +1,68 @@
-import numpy as np
+from graphics import *
 
-def generar_tablero(n):
+def draw_board(window, rows, cols, size):
     '''
-    Generamos un arreglo con posibles escaleras que tendrian un valor positivo (+) y
-    las serpientes con valor negativo (-).
+    Colores del tablero
     '''
-    escalerasyserpientes = np.arange(-10,11,1)
+    colors = ["Yellow", "Red", "Green", "Blue", "White", "Orange", 
+              "Pink", "Purple", "Light Blue", "Light Green"]  # Secuencia de 10 colores
     '''
-    Se genera un arreglo de la misma dimension que las serpientes y escales con la probabilidad que
-    salga en nuestro tablero, con probabilidades igualitarias para numeros diferentes del 0
+    Primero dibujamos nuestros círculos blancos
     '''
-    probabilidades = np.where(escalerasyserpientes == 0,0.5,0.025)
-    '''
-    Generamos nuestro tablero con los valores de serpientes y escaleras de tamano n*n, y usando
-    el arreglo de probabilidades
-    '''
-    tablero = np.random.choice(escalerasyserpientes, size=(n*n),p=probabilidades)
-    '''
-    Puesto que en este tablero las escaleres o serpientes pueden tener valores que nos "sacarian del
-    tablero" ajustamos esos valores a sus limites
-    '''
-    for i in range(len(tablero)):
-        '''
-        En la primera casilla no habra ni escalera ni serpiente porque es la inicial
-        '''
-        if i== 0:
-            tablero[i] = 0
-        '''
-        Este es el caso en que una serpientes rebasa nuestro limite inferior del tablero
-        '''
-        if tablero[i] + i < 0:      
-            tablero[i] = -i
-        '''
-        Este es el caso donde una escalera rebase nuestro limite superior del tablero
-        '''
-        if tablero[i] + i >= len(tablero):
-            tablero[i] = len(tablero) - i -1
-        '''
-        Condicionales para no tener bucles
-        '''
-        if tablero[i] > 0 :
-            if tablero[tablero[i]+i] != 0:
-                tablero[[tablero[i]+i]] = 0
+    for i in range(rows):
+        for j in range(cols):
+            x1, y1 = j * size, i * size
+            x2, y2 = x1 + size, y1 + size
 
-        if tablero[len(tablero)-i-1] < 0:
-            if tablero[(tablero[len(tablero)-i-1])+len(tablero)-i-1] != 0:
-                tablero[(tablero[len(tablero)-i-1])+len(tablero)-i-1] = 0
+            # Dibujar el círculo con borde exterior blanco
+            center_x = (x1 + x2) / 2
+            center_y = (y1 + y2) / 2
+            radius = size / 1.8  # Ajusta el tamaño del círculo
 
+            # Círculo con borde blanco
+            circle_outer = Circle(Point(center_x, center_y), radius)  # Hacemos el radio un poco más grande
+            circle_outer.setOutline("white")  # Borde exterior blanco
+            circle_outer.setFill("white")
+            circle_outer.draw(window)
 
+    '''
+    Luego los círculos de colores y los números
+    '''
+    number = 1  # Empezamos la numeración desde 1
+    for i in range(rows - 1, -1, -1):  # Comienza desde la fila inferior
+        for j in range(cols):
+            x1, y1 = j * size, i * size
+            x2, y2 = x1 + size, y1 + size
+            # Dibujar el círculo en el centro de la casilla
+            center_x = (x1 + x2) / 2
+            center_y = (y1 + y2) / 2
+            radius = size / 2  # Ajusta el tamaño del círculo
+            circle_inner = Circle(Point(center_x, center_y), radius)
+            color_index = (j + i) % len(colors)
+            circle_inner.setFill(colors[color_index])  # Puedes cambiar el color del círculo
+            circle_inner.draw(window)
+
+            label_circle = Circle(Point(center_x, center_y - radius / 1.5), radius/2.9)
+            label_circle.setFill("white")
+            label_circle.draw(window)
+
+            # Dibujar el número de la casilla
+            text = Text(Point(center_x, center_y - radius / 1.5), str(number))
+            text.setSize(int(radius//3.5))  # Ajusta el tamaño del número
+            text.setTextColor("black")  # Color del texto (número)
+            text.draw(window)
+
+            # Incrementar el número para la siguiente casilla
+            number += 1
+
+def main():
+    rows, cols, size = 10, 15, 50
+    win = GraphWin("Serpientes y Escaleras", cols * size, rows * size)
+    win.setBackground("lightgreen")
+    draw_board(win, rows, cols, size)
     
-    return tablero
+    win.getMouse()  # Espera un clic antes de cerrar
+    win.close()
 
-# Tamaño de la matriz
-n = 5  # Cambia esto por el tamaño que desees
-
-# Generar y mostrar la matriz
-for i in range(10):
-    tablero = generar_tablero(n)
-    print(tablero)
+if __name__ == "__main__":
+    main()
