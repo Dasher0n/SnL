@@ -1,9 +1,7 @@
 import tkinter as tk
-from clases import JuegoSerpientesYEscaleras
-
+from clases import StartMenu
 
 if __name__ == "__main__":
-    tamaño = int(input("Ingrese el tamaño del tablero: "))
     root = tk.Tk()
-    juego = JuegoSerpientesYEscaleras(root, tamaño)
+    app = StartMenu(root)
     root.mainloop()

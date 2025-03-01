@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, font
 import numpy as np
 import random
 from PIL import Image, ImageTk
@@ -144,6 +144,7 @@ class JuegoSerpientesYEscaleras:
         lanzamiento = self.dado.lanzar()
         self.lanzamiento_display.config(text=str(lanzamiento))
         self.registro.insert(tk.END, f"{self.turno.nombre} lanzó un {lanzamiento}\n")
+        self.registro.see(tk.END)
         nueva_posicion = self.turno.puntuacion + lanzamiento
         if nueva_posicion > self.tablero.tamaño:
             nueva_posicion = self.tablero.tamaño
@@ -157,6 +158,7 @@ class JuegoSerpientesYEscaleras:
         elif nueva_posicion in self.tablero.escaleras:
             self.registro.insert(tk.END, f"{self.turno.nombre} subió una escalera a la casilla {nueva_posicion}\n")
         self.registro.insert(tk.END, f"{self.turno.nombre} está en la casilla {self.turno.puntuacion}\n")
+        self.registro.see(tk.END)
 
         if self.turno.puntuacion == self.tablero.tamaño:
             messagebox.showinfo("Juego terminado", f"{self.turno.nombre} ha ganado!")
@@ -319,3 +321,50 @@ class Tablero:
             return self.escaleras[posicion]
         else:
             return posicion
+
+class StartMenu:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Serpientes y Escaleras")
+
+        self.frame = tk.Frame(root)
+        self.frame.pack(padx=20, pady=20)
+
+        bold_font = font.Font(family="Helvetica", size=16, weight="bold")
+        self.label = tk.Label(self.frame, text="Serpientes y Escaleras", font=bold_font)
+        self.label.pack(pady=10)
+
+        integrantes = ["Burciaga Piña Erick Osvaldo", "Camargo Badillo Luis Mauricio", "Gudiño Romero Miguel Ángel"]
+        for integrante in integrantes:
+            integrante_label = tk.Label(self.frame, text=f"• {integrante}", font=("Helvetica", 11), anchor="center")
+            integrante_label.pack(pady=2)
+
+        spacer = tk.Frame(self.frame, height=10)
+        spacer.pack()
+
+        self.info_label2 = tk.Label(self.frame, text="Minería de Datos", font=("Helvetica", 11))
+        self.info_label2.pack(pady=2)
+
+        self.info_label3 = tk.Label(self.frame, text="Matemáticas Aplicadas y Computación", font=("Helvetica", 11))
+        self.info_label3.pack(pady=2)
+
+        spacer = tk.Frame(self.frame, height=10)
+        spacer.pack()
+
+        self.tamaño_label = tk.Label(self.frame, text="Ingresa el tamaño del tablero:")
+        self.tamaño_label.pack(pady=5)
+
+        self.tamaño_entry = tk.Entry(self.frame)
+        self.tamaño_entry.pack(pady=5)
+        self.tamaño_entry.bind("<Return>", self.iniciar_juego_event)
+
+        self.start_button = tk.Button(self.frame, text="Iniciar", command=self.iniciar_juego)
+        self.start_button.pack(pady=20)
+
+    def iniciar_juego(self):
+        tamaño = int(self.tamaño_entry.get())
+        self.frame.destroy()
+        JuegoSerpientesYEscaleras(self.root, tamaño)
+
+    def iniciar_juego_event(self, event):
+        self.iniciar_juego()
