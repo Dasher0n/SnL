@@ -19,8 +19,8 @@ class JuegoSerpientesYEscaleras:
         self.canvas.pack(side=tk.LEFT)
 
         # Cargar y redimensionar imágenes de jugadores
-        self.img_jugador1 = self.cargar_imagen("jugador1.png", 30, 30)
-        self.img_jugador2 = self.cargar_imagen("jugador2.png", 30, 30)
+        self.img_jugador1 = self.cargar_imagen("assets/jugador1.png", 30, 30)
+        self.img_jugador2 = self.cargar_imagen("assets/jugador2.png", 30, 30)
 
         self.dibujar_tablero()
         self.actualizar_posiciones()
