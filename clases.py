@@ -89,6 +89,10 @@ class JuegoSerpientesYEscaleras:
 
         self.canvas.create_line(x1, y1, x2, y2, fill=color, width=2)
 
+        radio_punto = 3
+        self.canvas.create_oval(x1 - radio_punto, y1 - radio_punto, x1 + radio_punto, y1 + radio_punto, fill="black")
+        self.canvas.create_oval(x2 - radio_punto, y2 - radio_punto, x2 + radio_punto, y2 + radio_punto, fill="black")
+
     def actualizar_posiciones(self):
         self.canvas.delete("jugador")
         self.dibujar_jugador(self.jugador1, self.img_jugador1)
