@@ -3,6 +3,7 @@ from tkinter import messagebox, font
 import numpy as np
 import random
 from PIL import Image, ImageTk
+import math
 
 class JuegoSerpientesYEscaleras:
     def __init__(self, root, tamaño):
@@ -32,7 +33,7 @@ class JuegoSerpientesYEscaleras:
         self.boton_lanzar = tk.Button(self.lanzamiento_frame, text="Lanzar Dado", command=self.lanzar_dado)
         self.boton_lanzar.pack()
 
-        self.lanzamiento_label = tk.Label(self.lanzamiento_frame, text="Lanzamiento del dado:")
+        self.lanzamiento_label = tk.Label(self.lanzamiento_frame, text="Resultado del dado:")
         self.lanzamiento_label.pack()
 
         self.lanzamiento_display = tk.Label(self.lanzamiento_frame, text="", font=("Helvetica", 24))
@@ -362,7 +363,22 @@ class StartMenu:
         self.start_button.pack(pady=20)
 
     def iniciar_juego(self):
-        tamaño = int(self.tamaño_entry.get())
+        tamaño_str = self.tamaño_entry.get()
+        if not tamaño_str.isdigit():
+            messagebox.showerror("Error", "Por favor, ingresa un número entero válido.")
+            return
+
+        tamaño = int(tamaño_str)
+        sqrt_tamaño = math.isqrt(tamaño)
+        if sqrt_tamaño * sqrt_tamaño != tamaño:
+            closest_square = sqrt_tamaño * sqrt_tamaño
+            if (sqrt_tamaño + 1) * (sqrt_tamaño + 1) - tamaño < tamaño - closest_square:
+                closest_square = (sqrt_tamaño + 1) * (sqrt_tamaño + 1)
+            response = messagebox.askyesno("Sugerencia", f"El tamaño ingresado no es un cuadrado perfecto. ¿Quieres usar {closest_square} en su lugar?")
+            if not response:
+                return
+            tamaño = closest_square
+
         self.frame.destroy()
         JuegoSerpientesYEscaleras(self.root, tamaño)
 
