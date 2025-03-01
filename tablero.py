@@ -10,7 +10,7 @@ def generar_tablero(n):
     Se genera un arreglo de la misma dimension que las serpientes y escales con la probabilidad que
     salga en nuestro tablero, con probabilidades igualitarias para numeros diferentes del 0
     '''
-    probabilidades = np.where(escalerasyserpientes == 0,0.75,0.0125)
+    probabilidades = np.where(escalerasyserpientes == 0,0.5,0.025)
     '''
     Generamos nuestro tablero con los valores de serpientes y escaleras de tamano n*n, y usando
     el arreglo de probabilidades
@@ -36,11 +36,25 @@ def generar_tablero(n):
         '''
         if tablero[i] + i >= len(tablero):
             tablero[i] = len(tablero) - i -1
+        '''
+        Condicionales para no tener bucles
+        '''
+        if tablero[i] > 0 :
+            if tablero[tablero[i]+i] != 0:
+                tablero[[tablero[i]+i]] = 0
+
+        if tablero[len(tablero)-i-1] < 0:
+            if tablero[(tablero[len(tablero)-i-1])+len(tablero)-i-1] != 0:
+                tablero[(tablero[len(tablero)-i-1])+len(tablero)-i-1] = 0
+
+
+    
     return tablero
 
 # Tamaño de la matriz
 n = 5  # Cambia esto por el tamaño que desees
 
 # Generar y mostrar la matriz
-tablero = generar_tablero(n)
-print(tablero)
+for i in range(10):
+    tablero = generar_tablero(n)
+    print(tablero)
