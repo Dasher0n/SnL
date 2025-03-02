@@ -23,6 +23,12 @@ class JuegoSerpientesYEscaleras:
         self.img_jugador1 = self.cargar_imagen("assets/jugador1.png", 30, 30)
         self.img_jugador2 = self.cargar_imagen("assets/jugador2.png", 30, 30)
 
+        # Mostrar el mapeo de las casillas en el registro
+        self.registro = tk.Text(root, width=40, height=15)
+        self.registro.pack(side=tk.RIGHT, padx=10, pady=10)
+        self.registro.insert(tk.END, f"Mapeo de casillas: {self.tablero.casillas}\n")
+        self.registro.see(tk.END)
+
         self.dibujar_tablero()
         self.actualizar_posiciones()
 
@@ -42,10 +48,6 @@ class JuegoSerpientesYEscaleras:
         # Botón para repetir la jugada anterior
         self.boton_repetir = tk.Button(self.lanzamiento_frame, text="Repetir Jugada", command=self.repetir_jugada)
         self.boton_repetir.pack(pady=10)
-
-        # Registro de movimientos
-        self.registro = tk.Text(root, width=40, height=15)
-        self.registro.pack(side=tk.RIGHT, padx=10, pady=10)
 
     def cargar_imagen(self, path, width, height):
         imagen = Image.open(path)
@@ -133,15 +135,17 @@ class JuegoSerpientesYEscaleras:
                 jugador.mover(nueva_posicion)
                 self.actualizar_posiciones()
                 if nueva_posicion in self.tablero.serpientes:
-                    self.root.after(1000, lambda: self.mover_jugador(jugador, self.tablero.serpientes[nueva_posicion]))
+                    self.root.after(1000, lambda: self.mover_jugador(jugador, self.tablero.serpientes[nueva_posicion], callback))
                 elif nueva_posicion in self.tablero.escaleras:
-                    self.root.after(1000, lambda: self.mover_jugador(jugador, self.tablero.escaleras[nueva_posicion]))
-                elif callback:
-                    callback()
+                    self.root.after(1000, lambda: self.mover_jugador(jugador, self.tablero.escaleras[nueva_posicion], callback))
+                else:
+                    if callback:
+                        callback()
 
         animar(posiciones)
 
     def lanzar_dado(self):
+        self.boton_lanzar.config(state=tk.DISABLED)  # Deshabilitar el botón
         lanzamiento = self.dado.lanzar()
         self.lanzamiento_display.config(text=str(lanzamiento))
         self.registro.insert(tk.END, f"{self.turno.nombre} lanzó un {lanzamiento}\n")
@@ -166,11 +170,12 @@ class JuegoSerpientesYEscaleras:
             self.root.quit()
         else:
             self.turno = self.jugador1 if self.turno == self.jugador2 else self.jugador2
+            self.boton_lanzar.config(state=tk.NORMAL)  # Habilitar el botón
 
     def repetir_jugada(self):
         if self.ultima_jugada:
             jugador, nueva_posicion = self.ultima_jugada
-            self.mover_jugador(jugador, nueva_posicion, callback=None)
+            self.mover_jugador(jugador, nueva_posicion, self.finalizar_turno)
 
 
 class Dado:
@@ -238,6 +243,7 @@ class Jugador:
         """
         self.puntuacion = casilla
 
+
 class Tablero:
     """
     Clase que representa el tablero de juego de Serpientes y Escaleras.
@@ -260,6 +266,7 @@ class Tablero:
             tamaño (int): El tamaño del tablero (número de casillas).
         """
         self.tamaño = tamaño
+        self.factor = max(1, tamaño // 25)  # Ajustar el factor según el tamaño del tablero
         self.serpientes = self.generar_serpientes()
         self.escaleras = self.generar_escaleras()
         self.casillas = self.generar_casillas()
@@ -272,10 +279,14 @@ class Tablero:
             dict: Diccionario que mapea la cabeza de la serpiente a su cola.
         """
         serpientes = {}
-        for _ in range(random.randint(5, 10)):
+        num_serpientes = min(random.randint(1, 5) * self.factor, self.tamaño // 2)
+        intentos = 0
+        while len(serpientes) < num_serpientes and intentos < 100:
             cabeza = random.randint(2, self.tamaño - 1)
             cola = random.randint(1, cabeza - 1)
-            serpientes[cabeza] = cola
+            if cabeza not in serpientes and cola not in serpientes.values():
+                serpientes[cabeza] = cola
+            intentos += 1
         return serpientes
 
     def generar_escaleras(self):
@@ -286,10 +297,16 @@ class Tablero:
             dict: Diccionario que mapea el inicio de la escalera a su fin.
         """
         escaleras = {}
-        for _ in range(random.randint(5, 10)):
+        num_escaleras = min(random.randint(1, 5) * self.factor, self.tamaño // 2)
+        intentos = 0
+        while len(escaleras) < num_escaleras and intentos < 100:
             inicio = random.randint(1, self.tamaño - 2)
             fin = random.randint(inicio + 1, self.tamaño)
-            escaleras[inicio] = fin
+            if (inicio not in escaleras and inicio not in self.serpientes and
+                fin not in self.serpientes.values() and fin not in escaleras.values() and
+                inicio not in self.serpientes.values() and fin not in self.serpientes):
+                escaleras[inicio] = fin
+            intentos += 1
         return escaleras
 
     def generar_casillas(self):
@@ -364,11 +381,14 @@ class StartMenu:
 
     def iniciar_juego(self):
         tamaño_str = self.tamaño_entry.get()
-        if not tamaño_str.isdigit() or int(tamaño_str) <= 0:
-            messagebox.showerror("Error", "Por favor, ingresa un número natural válido.")
+        try:
+            tamaño = int(tamaño_str)
+            if tamaño <= 0:
+                raise ValueError("El tamaño debe ser un número natural mayor que 0.")
+        except ValueError as e:
+            messagebox.showerror("Error", f"Por favor, ingresa un número natural válido. ")
             return
 
-        tamaño = int(tamaño_str)
         if tamaño > 225:
             messagebox.showerror("Error", "El tamaño máximo permitido es 225.")
             return
