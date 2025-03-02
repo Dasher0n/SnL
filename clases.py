@@ -364,8 +364,8 @@ class StartMenu:
 
     def iniciar_juego(self):
         tamaño_str = self.tamaño_entry.get()
-        if not tamaño_str.isdigit():
-            messagebox.showerror("Error", "Por favor, ingresa un número entero válido.")
+        if not tamaño_str.isdigit() or int(tamaño_str) <= 0:
+            messagebox.showerror("Error", "Por favor, ingresa un número natural válido.")
             return
 
         tamaño = int(tamaño_str)
