@@ -369,6 +369,10 @@ class StartMenu:
             return
 
         tamaño = int(tamaño_str)
+        if tamaño > 225:
+            messagebox.showerror("Error", "El tamaño máximo permitido es 225.")
+            return
+
         sqrt_tamaño = math.isqrt(tamaño)
         if sqrt_tamaño * sqrt_tamaño != tamaño:
             closest_square = sqrt_tamaño * sqrt_tamaño
