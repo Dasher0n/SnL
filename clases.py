@@ -5,14 +5,16 @@ Nuestra primera clase es de nuestros jugadores, se le asigna un color, y todos c
 el que los avanza o los retrocede con escaleras o serpientes, pero el jugador solo tira el dado
 '''
 class Jugador:
-    def __init__(self, color_ficha, posicion=0):
+    def __init__(self, color_ficha,imagen, posicion=0):
         self.color_ficha = color_ficha
         self.posicion = posicion
+        self.imagen = imagen
 
     def tirar_dado(self):
         caradeldado = random.randint(1, 6)
         print(f"{self.color_ficha} sacó un {caradeldado}")
         self.posicion += caradeldado
+
 '''
 Esta es una funcion que nos ayudara a hacer un resumen del juego completo
 '''
@@ -24,13 +26,7 @@ def posiciones_del_juego(jugadores, historial_posiciones, posiciones_numero_rond
         posiciones_ronda[jugador.color_ficha] = jugador.posicion
     # Añadir las posiciones de esta ronda al historial
     historial_posiciones[posiciones_numero_ronda] = posiciones_ronda
-    # Mostrar el historial de posiciones hasta ahora
-    print("Posiciones hasta ahora:")
-    for ronda, posiciones in historial_posiciones.items():
-        print(f"Ronda {ronda}: {posiciones}")
-    posiciones_numero_ronda += 1
-
-    return jugadores, historial_posiciones, posiciones_numero_ronda
+    return jugadores, historial_posiciones
 ''''
 Esta funcion imprime el resumen del juego
 '''
