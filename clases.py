@@ -391,6 +391,8 @@ class StartMenu:
             closest_square = sqrt_tamaño * sqrt_tamaño
             if (sqrt_tamaño + 1) * (sqrt_tamaño + 1) - tamaño < tamaño - closest_square:
                 closest_square = (sqrt_tamaño + 1) * (sqrt_tamaño + 1)
+            if closest_square <= 1:
+                closest_square = 4  # Asegurarse de que el tamaño recomendado sea mayor que 1
             response = messagebox.askyesno("Sugerencia", f"El tamaño ingresado no es un cuadrado perfecto. ¿Quieres usar {closest_square} en su lugar?")
             if not response:
                 return
