@@ -135,8 +135,10 @@ class JuegoSerpientesYEscaleras:
                 jugador.mover(nueva_posicion)
                 self.actualizar_posiciones()
                 if nueva_posicion in self.tablero.serpientes:
+                    self.registro.insert(tk.END, f"{jugador.nombre} cayó en una serpiente y bajó a la casilla {self.tablero.serpientes[nueva_posicion]}\nSerpiente \n")
                     self.root.after(1000, lambda: self.mover_jugador(jugador, self.tablero.serpientes[nueva_posicion], callback))
                 elif nueva_posicion in self.tablero.escaleras:
+                    self.registro.insert(tk.END, f"{jugador.nombre} subió una escalera a la casilla {self.tablero.escaleras[nueva_posicion]}\nEscalera \n")
                     self.root.after(1000, lambda: self.mover_jugador(jugador, self.tablero.escaleras[nueva_posicion], callback))
                 else:
                     if callback:
@@ -157,11 +159,6 @@ class JuegoSerpientesYEscaleras:
         self.mover_jugador(self.turno, nueva_posicion, self.finalizar_turno)
 
     def finalizar_turno(self):
-        nueva_posicion = self.turno.puntuacion
-        if nueva_posicion in self.tablero.serpientes:
-            self.registro.insert(tk.END, f"{self.turno.nombre} cayó en una serpiente y bajó a la casilla {self.tablero.serpientes[nueva_posicion]}\n")
-        elif nueva_posicion in self.tablero.escaleras:
-            self.registro.insert(tk.END, f"{self.turno.nombre} subió una escalera a la casilla {self.tablero.escaleras[nueva_posicion]}\n")
         self.registro.insert(tk.END, f"{self.turno.nombre} está en la casilla {self.turno.puntuacion}\n")
         self.registro.see(tk.END)
 
