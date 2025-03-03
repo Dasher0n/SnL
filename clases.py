@@ -350,7 +350,7 @@ class StartMenu:
         self.label = tk.Label(self.frame, text="Serpientes y Escaleras", font=bold_font)
         self.label.pack(pady=10)
 
-        integrantes = ["Burciaga Piña Erick Osvaldo", "Camargo Badillo Luis Mauricio", "Gudiño Romero Miguel Ángel"]
+        integrantes = ["Camargo Badillo Luis Mauricio", "Gudiño Romero Miguel Ángel"]
         for integrante in integrantes:
             integrante_label = tk.Label(self.frame, text=f"• {integrante}", font=("Helvetica", 11), anchor="center")
             integrante_label.pack(pady=2)
