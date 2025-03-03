@@ -282,6 +282,11 @@ class Tablero:
         escaleras = {}
         posiciones_ocupadas = set()
         num_elementos = min(random.randint(1, 5) * self.factor, self.tamaño // 2)
+
+        # Asegurarse de que num_elementos * 2 no exceda el rango disponible
+        max_elements = (self.tamaño - 2) // 2
+        num_elementos = min(num_elementos, max_elements)
+
         posiciones = random.sample(range(2, self.tamaño), num_elementos * 2)
 
         for i in range(num_elementos):
