@@ -6,7 +6,7 @@ from PIL import Image, ImageTk
 import math
 
 class JuegoSerpientesYEscaleras:
-    def __init__(self, root, tamaño):
+    def __init__(self, root, tamaño, jugador_seleccionado):
         self.root = root
         self.root.title("Serpientes y Escaleras")
         self.tablero = Tablero(tamaño)
@@ -20,8 +20,12 @@ class JuegoSerpientesYEscaleras:
         self.canvas.pack(side=tk.LEFT)
 
         # Cargar y redimensionar imágenes de jugadores
-        self.img_jugador1 = self.cargar_imagen("assets/jugador1.png", 30, 30)
-        self.img_jugador2 = self.cargar_imagen("assets/jugador2.png", 30, 30)
+        if jugador_seleccionado == "jugador1":
+            self.img_jugador1 = self.cargar_imagen("assets/jugador1.png", 30, 30)
+            self.img_jugador2 = self.cargar_imagen("assets/jugador2.png", 30, 30)
+        else:
+            self.img_jugador1 = self.cargar_imagen("assets/jugador2.png", 30, 30)
+            self.img_jugador2 = self.cargar_imagen("assets/jugador1.png", 30, 30)
 
         # Mostrar el mapeo de las casillas en el registro
         self.registro = tk.Text(root, width=40, height=15)
@@ -372,10 +376,10 @@ class StartMenu:
         tamaño_str = self.tamaño_entry.get()
         try:
             tamaño = int(tamaño_str)
-            if tamaño <= 0:
-                raise ValueError("El tamaño debe ser un número natural mayor que 0.")
+            if tamaño <= 1:
+                raise ValueError("El tamaño debe ser un número natural mayor que 1.")
         except ValueError as e:
-            messagebox.showerror("Error", f"Por favor, ingresa un número natural válido. ")
+            messagebox.showerror("Error", f"Por favor, ingresa un número natural válido. {e}")
             return
 
         if tamaño > 225:
@@ -393,7 +397,40 @@ class StartMenu:
             tamaño = closest_square
 
         self.frame.destroy()
-        JuegoSerpientesYEscaleras(self.root, tamaño)
+        SeleccionarJugador(self.root, tamaño, self.iniciar_juego_con_jugador)
+
+    def iniciar_juego_con_jugador(self, tamaño, jugador):
+        JuegoSerpientesYEscaleras(self.root, tamaño, jugador)
 
     def iniciar_juego_event(self, event):
         self.iniciar_juego()
+
+class SeleccionarJugador:
+    def __init__(self, root, tamaño, callback):
+        self.root = root
+        self.tamaño = tamaño
+        self.callback = callback
+
+        self.frame = tk.Frame(root)
+        self.frame.pack(padx=20, pady=20)
+
+        self.label = tk.Label(self.frame, text="Selecciona tu jugador", font=("Helvetica", 16))
+        self.label.pack(pady=10)
+
+        self.img_jugador1 = self.cargar_imagen("assets/jugador1.png", 100, 100)
+        self.img_jugador2 = self.cargar_imagen("assets/jugador2.png", 100, 100)
+
+        self.boton_jugador1 = tk.Button(self.frame, image=self.img_jugador1, command=lambda: self.seleccionar_jugador("jugador1"))
+        self.boton_jugador1.pack(side=tk.LEFT, padx=10)
+
+        self.boton_jugador2 = tk.Button(self.frame, image=self.img_jugador2, command=lambda: self.seleccionar_jugador("jugador2"))
+        self.boton_jugador2.pack(side=tk.RIGHT, padx=10)
+
+    def cargar_imagen(self, path, width, height):
+        imagen = Image.open(path)
+        imagen = imagen.resize((width, height), Image.LANCZOS)
+        return ImageTk.PhotoImage(imagen)
+
+    def seleccionar_jugador(self, jugador):
+        self.frame.destroy()
+        self.callback(self.tamaño, jugador)
