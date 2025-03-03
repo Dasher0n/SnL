@@ -159,9 +159,9 @@ class JuegoSerpientesYEscaleras:
     def finalizar_turno(self):
         nueva_posicion = self.turno.puntuacion
         if nueva_posicion in self.tablero.serpientes:
-            self.registro.insert(tk.END, f"{self.turno.nombre} cayó en una serpiente y bajó a la casilla {nueva_posicion}\n")
+            self.registro.insert(tk.END, f"{self.turno.nombre} cayó en una serpiente y bajó a la casilla {self.tablero.serpientes[nueva_posicion]}\n")
         elif nueva_posicion in self.tablero.escaleras:
-            self.registro.insert(tk.END, f"{self.turno.nombre} subió una escalera a la casilla {nueva_posicion}\n")
+            self.registro.insert(tk.END, f"{self.turno.nombre} subió una escalera a la casilla {self.tablero.escaleras[nueva_posicion]}\n")
         self.registro.insert(tk.END, f"{self.turno.nombre} está en la casilla {self.turno.puntuacion}\n")
         self.registro.see(tk.END)
 
@@ -267,47 +267,39 @@ class Tablero:
         """
         self.tamaño = tamaño
         self.factor = max(1, tamaño // 25)  # Ajustar el factor según el tamaño del tablero
-        self.serpientes = self.generar_serpientes()
-        self.escaleras = self.generar_escaleras()
+        self.serpientes, self.escaleras = self.generar_serpientes_y_escaleras()
         self.casillas = self.generar_casillas()
 
-    def generar_serpientes(self):
+    def generar_serpientes_y_escaleras(self):
         """
-        Genera un diccionario de serpientes aleatorias en el tablero.
+        Genera diccionarios de serpientes y escaleras aleatorias en el tablero.
 
         Devuelve:
-            dict: Diccionario que mapea la cabeza de la serpiente a su cola.
+            tuple: Dos diccionarios que mapean la cabeza de la serpiente a su cola y el inicio de la escalera a su fin.
         """
         serpientes = {}
-        num_serpientes = min(random.randint(1, 5) * self.factor, self.tamaño // 2)
-        intentos = 0
-        while len(serpientes) < num_serpientes and intentos < 100:
-            cabeza = random.randint(2, self.tamaño - 1)
-            cola = random.randint(1, cabeza - 1)
-            if cabeza not in serpientes and cola not in serpientes.values():
-                serpientes[cabeza] = cola
-            intentos += 1
-        return serpientes
-
-    def generar_escaleras(self):
-        """
-        Genera un diccionario de escaleras aleatorias en el tablero.
-
-        Devuelve:
-            dict: Diccionario que mapea el inicio de la escalera a su fin.
-        """
         escaleras = {}
-        num_escaleras = min(random.randint(1, 5) * self.factor, self.tamaño // 2)
-        intentos = 0
-        while len(escaleras) < num_escaleras and intentos < 100:
-            inicio = random.randint(1, self.tamaño - 2)
+        posiciones_ocupadas = set()
+        num_elementos = min(random.randint(1, 5) * self.factor, self.tamaño // 2)
+        posiciones = random.sample(range(2, self.tamaño), num_elementos * 2)
+
+        for i in range(num_elementos):
+            cabeza = posiciones.pop()
+            cola = random.randint(1, cabeza - 1)
+            if (cabeza not in posiciones_ocupadas and cola not in posiciones_ocupadas):
+                serpientes[cabeza] = cola
+                posiciones_ocupadas.add(cabeza)
+                posiciones_ocupadas.add(cola)
+
+        for i in range(num_elementos):
+            inicio = posiciones.pop()
             fin = random.randint(inicio + 1, self.tamaño)
-            if (inicio not in escaleras and inicio not in self.serpientes and
-                fin not in self.serpientes.values() and fin not in escaleras.values() and
-                inicio not in self.serpientes.values() and fin not in self.serpientes):
+            if (inicio not in posiciones_ocupadas and fin not in posiciones_ocupadas):
                 escaleras[inicio] = fin
-            intentos += 1
-        return escaleras
+                posiciones_ocupadas.add(inicio)
+                posiciones_ocupadas.add(fin)
+
+        return serpientes, escaleras
 
     def generar_casillas(self):
         """
